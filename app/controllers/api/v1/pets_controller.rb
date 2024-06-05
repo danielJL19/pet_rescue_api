@@ -1,15 +1,16 @@
-class PetsController < ApplicationController
+class Api::V1::PetsController < ApplicationController
   before_action :set_pet, only: %i[show update destroy]
 
   # GET /pets
   def index
     @pets = Pet.all
-    render json: @pets
+    # pets_serialized = @pets.map{ |pet| PetSerializer.new}
+    render json: [{ data: (@pets, each_serializer: PetSerializer) }]
   end
 
   # GET /pets/1
   def show
-    render json: @pet
+    render json: ['data' => @pet], status: :found
   end
 
   # POST /pets
