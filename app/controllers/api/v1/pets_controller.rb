@@ -1,11 +1,11 @@
 class Api::V1::PetsController < ApplicationController
+  before_action :authenticate_user!, except: %i[index show]
   before_action :set_pet, only: %i[show update destroy]
 
   # GET /pets
   def index
-    @pets = Pet.all
-    # pets_serialized = @pets.map{ |pet| PetSerializer.new}
-    render json: [{ data: (@pets, each_serializer: PetSerializer) }]
+    @pets = Pet.order(created_at: :desc)
+    render json: { data: @pets, status: 200, message: 'all products successfully' }, status: :ok
   end
 
   # GET /pets/1
@@ -18,9 +18,9 @@ class Api::V1::PetsController < ApplicationController
     @pet = Pet.new(pet_params)
 
     if @pet.save
-      render json: @pet, status: :created, location: @pet
+      render json: @pet, status: :created
     else
-      render json: @pet.errors, status: :unprocessable_entity
+      render json: @pet.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -47,6 +47,6 @@ class Api::V1::PetsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def pet_params
-    params.require(:pet).permit(:name, :type, :description)
+    params.require(:pet).permit(:name, :type_of_pet, :description)
   end
 end
